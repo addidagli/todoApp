@@ -6,18 +6,32 @@
             </h3>
 
             <div class="input-group mb-3">
-                <input #txtItem type="text" class="form-control" (keyup.enter)="addItem(txtItem.value); txtItem.value=''">  <!-- sadece keyup yazarsan inputa yazılan anında aktarılır -->
-                <button class="btn btn-outline-primary" (click)="addItem(txtItem.value); txtItem.value=''">Add</button>
+                <input
+                [(ngModel)]="message"
+                type="text" class="form-control"
+                [(ngModel)]="inputText"
+                (keyup.enter)="addItem();">  <!-- sadece keyup yazarsan inputa yazılan anında aktarılır -->
+                <button
+                [class]="getBtnClasses()"
+                class="btn"
+                (click)="addItem();">Add</button>
             </div>
 
             <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" name="" id="displayAll">
+                <input type="checkbox" [(ngModel)]="displayAll" class="form-check-input" name="" id="displayAll">
                 <label for="displayAll" class="form-check-label">Hepsini Göster</label>
             </div>
 
-            {{ message }}
+            <div class="my-2">
+                {{ displayCount() }} görev tamamlandı.
+            </div>
 
-            <table class="table table-bordered">
+            <div class="alert alert-warning" *ngIf="getItems().length == 0 else itemsTable">
+                Tüm görevler tamamlandı.
+            </div>
+
+            <ng-template #itemsTable>
+               <table class="table table-bordered" *ngIf="getItems().length > 0 ">
                 <thead>
                     <tr>
                         <th></th>
@@ -26,13 +40,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let item of getItems(); let i = index;">
+                    <tr *ngFor="let item of getItems(); let i = index;" [class]="{ 'bg-primary': item.action, 'bg-warning': !item.action }"  >
                         <td>{{ i+1 }}</td>
                         <td>{{ item.description }}</td>
-                        <td>{{ item.action }}</td>
+                        <td>
+                            <!-- <div *ngIf="item.action">Yes</div>
+                            <div *ngIf="!item.action">No</div> -->
+
+                            <!-- <div [ngSwitch]="item.action">
+                                <div *ngSwitchCase="true">Yes</div>
+                                <div *ngSwitchDefault>No</div>
+                            </div> -->
+
+                            <div *ngIf="item.action; else noTemplate">
+                                Yes
+                            </div>
+                            <ng-template #noTemplate>
+                                No
+                            </ng-template>
+
+                        </td>
+                        <td>
+                            <input type="checkbox" (change)="onActionChanged(item)"  [(ngModel)]="item.action" name="" id="">
+                        </td>
                     </tr> 
                 </tbody>
-            </table>
+            </table> 
+            </ng-template>
+
+            
+           
         </div>
     </div>
 </div>
